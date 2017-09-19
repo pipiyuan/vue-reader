@@ -180,7 +180,7 @@ export default {
         },
         curChapterId(val, oldVal){ //章节改变 获取数据
             // console.log(val)
-            this.getChapterContent(val.id, this.$store.state.article.getChapterType)
+            this.getChapterContent(val, this.$store.state.article.getChapterType)
         }
     }
 }
