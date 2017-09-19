@@ -1,16 +1,16 @@
 <template>
 	<div class="wrap container-padding">
 		<div class="recommend-list">
-			<h3>{{title}}{{bookList.length}}</h3>
-			<div class="list">
-				<div class="list-item" v-for="item in bookList">
+			<h3>{{title}}</h3>
+			<el-row :gutter="15" class="list">
+				<el-col :span="6" class="list-item" v-for="item in bookList">
 					<router-link :to="`/bookdetail/${item.id}`">
-					    <img :src="item.images" alt="">
-					    <p>{{item.name}}</p>
+					    <img :src="item.imageUrl" alt="">
+					    <p>{{item.bookName}}</p>
 					    <p>{{item.author}}</p>
 					</router-link>
-				</div>
-			</div>
+				</el-col>
+			</el-row>
 		</div>
 	</div>
 </template>
@@ -33,6 +33,7 @@ export default {
 .wrap{
 	background-color: #fff;
 	margin: .2rem 0;
+	padding-bottom: .2rem;
 	.recommend-list{
 		overflow: hidden;
 		h3{
@@ -52,7 +53,7 @@ export default {
 			}
 			.list-item{
 				flex:1;
-				margin-right: .1rem;
+				// margin-right: .1rem;
 				img{
 					height: 2rem;
 				}

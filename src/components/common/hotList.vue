@@ -3,17 +3,15 @@
 		<div class="hot-list">
 			<h3>{{title}}</h3>
 			<div class="list">
-				<router-link class="list-item" tag="div" :to="`/bookdetail/${item.id}`" v-for="item in bookList" key="item.id">
-				    <img :src="item.images" alt="">
+				<router-link class="list-item" tag="div" :to="`/bookdetail/${item.id}`" v-for="(item,index) in bookList" key="index">
+				    <img :src="item.imageUrl" alt="">
 				    <div class="book-info">
-				    	<h4>{{item.name}}</h4>
+				    	<h4>{{item.bookName}}</h4>
 				    	<p class="digest">{{item.intro}}</p>
 				    	<div class="bottom">
 				    		<p class="name">{{item.author}}</p>
 				    		<p class="dec">
-				    			<span>{{item.type}}</span>
-				    			<span>{{item.serialize}}</span>
-				    			<span>{{item.wordcount}}</span>
+				    			<span v-for="(item,index) in item.labels" key="index">{{item.tag}}</span>
 				    		</p>
 				    	</div>
 				    </div>
@@ -28,7 +26,7 @@ export default {
 		return {}
 	},
 	mounted(){
-		// console.log(this.bookList)
+		console.log(this.bookList)
 	},
 	props: ['title', 'bookList', 'discribe'],
 	methods: {

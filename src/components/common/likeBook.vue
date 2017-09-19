@@ -1,8 +1,8 @@
 <template>
 	<div class="like">
 		<router-link :to="{path:'/bookdetail/'+ likeBookData.id}">
-		    <img :src="likeBookData.images" alt="">
-		    <p>{{likeBookData.name}}</p>
+		    <img :src="likeBookData.imageUrl" alt="">
+		    <p>{{likeBookData.bookName}}</p>
 		</router-link>
 	</div>
 </template>
@@ -15,7 +15,7 @@ export default {
 		}
 	},
 	mounted(){
-		axios(`${this.apis.api}/booklist?id=${this.like}`)
+		axios(`${this.global.api}/book/${this.like}`)
 		    .then(res => {
 		      this.loading = true;
 		      this.likeBookData = res.data
@@ -34,8 +34,9 @@ export default {
 		display: block;
 		img{
 			display: block;
-			width: 1.1rem; 
-          	height: 1.5rem;
+			// width: 1.1rem; 
+          	// height: 1.5rem;
+   			width: 100%;
 		}
 		p{
 			font-size: .15rem;
