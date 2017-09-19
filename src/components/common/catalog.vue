@@ -7,7 +7,7 @@
 				<p>共章</p>
 			</div>
 			<div class="volumes">
-				<div class="item" :class="[{'chapter-bar': (item.chapterId==chapterId)}, {'chapter-li': (item.chapterId!==0)}, {'red': (item.chapterId==chapterId)}]" v-for="(item, index) in chapterList" key="index">
+				<div class="item" :class="[{'chapter-bar': (item.chapterId==curChapterId)}, {'chapter-li': (item.chapterId!==0)}, {'red': (item.chapterId==curChapterId)}]" v-for="(item, index) in chapterList" key="index">
 					<a class="" @click="switchChapterId(item.chapterId)">{{item.title}}</a>
 				</div>
 			</div>		
@@ -23,28 +23,20 @@ export default {
 		}
 	},
 	computed: {
-		articleId(){
-			return this.$store.state.article.articleId
-		},
-		chapterId(){
-			return this.$store.state.article.chapterId
-		},
-		showCatalog(){
-			return this.$store.state.article.chapterListState
-		}
 	},
 	mounted(){
-		axios(`${this.global.api}/book/chapter/${this.articleId}`)
+		axios(`${this.global.api}/book/chapter/${this.bookId}`)
         .then(res => {
             this.loading = true;
             this.chapterList = res.data;
         })
 	},
-	// props: ['showCatalog'],
+	props: ['bookId', 'curChapterId'],
 	methods: {
 		switchChapterId(id){
-			this.$store.dispatch('setReaderInfoOne', {key: 'chapterListState', val: !this.showCatalog});
+			this.$store.dispatch('setReaderInfoOne', {key: 'chapterListState', val: false});
 			this.$store.dispatch('setReaderInfoOne', {key: 'chapterId', val: id});
+			this.$store.dispatch('setReaderInfoOne', {key: 'getChapterType', val: false});
 		}
 	}
 }

@@ -2,11 +2,12 @@
     <div class="reader" :style="{backgroundColor:(articleInfo.isDaytime?'#1a1a1a':articleInfo.bgColor)}">
         <div class="top-nav" v-show="showBar">
             <a href="" title="">返回书架</a></div>
-        <div class="container container-padding" @click="showBar_fn" :style="{fontSize: articleInfo.fontSize}">
+        <div class="container container-padding" :style="{fontSize: articleInfo.fontSize}">
             <h2 :style="{backgroundColor:(articleInfo.isDaytime?'#1a1a1a':articleInfo.bgColor)}">{{articleTitle}}</h2>
-            <section :class="['read-section', {'is-daytime': article.isDaytime}]" v-for="(item,index) in articleData" key="index">
+            <section :class="['read-section', {'is-daytime': articleInfo.isDaytime}]" v-for="(item,index) in articleData" key="index">
                 <div class="article-content" v-html="item.content"></div>    
             </section>
+            <div class="click-arear" @click="showBar_fn"></div>
         </div>
         <div class="bottom-nav" v-show="showBar">
             <div class="font-content" v-show="show_font_bg">
@@ -43,7 +44,7 @@
                 <div class="item-nav">
                     <div class="nav" @click="daytime_fn">
                         <svg>
-                            <use xmlns:xlink="http://www.w3.org/1999/xlink" :xlink:href="article.isDaytime?'#reader-daytime-active':'#reader-daytime'"></use>
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" :xlink:href="articleInfo.isDaytime?'#reader-daytime-active':'#reader-daytime'"></use>
                         </svg>
                         <p>夜间</p>
                     </div>
@@ -51,7 +52,7 @@
             </div>
         </div>
         <div class="catalog-wrap" v-show="showCatalog">
-            <catalog :articleId="$route.params.id" :chapterId="articleInfo.curChapterId"></catalog>
+            <catalog :bookId="$route.params.id" :curChapterId="curChapterId"></catalog>
         </div>
     </div>
 </template>
@@ -77,9 +78,9 @@ export default {
         }
     },
     computed: {
-        ...mapState(['article']),
+        // ...mapState(['article']),
         bookId(){
-            return this.$route.params.id
+            return this.$route.params.id*1
         },
         articleInfo(){
             return this.$store.state.article
@@ -95,10 +96,13 @@ export default {
     mounted(){
         // 设置 文章数据
         let storageData = this.global.getLocalStorage('qidian_reader');
-        if (storageData && this.bookId === storageData.articleId) {
+        if (storageData && this.bookId == storageData.bookId) {
             this.$store.dispatch('setReaderInfoAll', storageData);
         }else{
-            this.$store.dispatch('setReaderInfoOne', {key: 'articleId', val: this.bookId}); //改变 articleId watch 里请求数据
+            this.$store.dispatch('setReaderInfoOne', {key: 'bookId', val: this.bookId}); //改变 bookId watch 里请求数据
+        }
+        if (this.curChapterId == 1) {
+            this.getChapterContent(this.curChapterId)
         }
 
         let this_ = this
@@ -108,20 +112,25 @@ export default {
             let scroll_top = document.body.scrollTop
             let distance_bottom = body_h-scroll_top-screen_h+60
             if (distance_bottom < 300 && !this_.loading) {
-                //改变 articleId watch 里请求数据
+                //改变 bookId watch 里请求数据
                 this_.$store.dispatch('setReaderInfoOne', {key: 'chapterId', val: this_.curChapterId+1});
+                this_.$store.dispatch('setReaderInfoOne', {key: 'getChapterType', val: true});
             }
         }
         
     },
     methods: {
-        getChapterContent(val){
+        getChapterContent(val, type){ // true为push，false为替换
             this.loading = true;
             axios(`${this.global.api}/book/${this.bookId}/${val}`)
             .then(res => {
                 this.loading = false;
+                if (type) {
+                    this.articleData.push(res.data)
+                }else{
+                    this.articleData = [res.data]
+                }
                 this.articleTitle = res.data.title
-                this.articleData.push(res.data)
             })
         },
         showBar_fn(){
@@ -134,11 +143,12 @@ export default {
             this.$store.dispatch('setReaderInfoOne', {key: 'fontSize', val: val});
         },
         showChapter_fn(){
+            // console.log(this.showCatalog)
             this.$store.dispatch('setReaderInfoOne', {key: 'chapterListState', val: !this.showCatalog});
         },
         daytime_fn(){
             // console.log(this.article)
-            this.$store.dispatch('setReaderInfoOne', {key: 'isDaytime', val: !this.article.isDaytime});
+            this.$store.dispatch('setReaderInfoOne', {key: 'isDaytime', val: !this.articleInfo.isDaytime});
         }
     },
     components:{
@@ -148,11 +158,19 @@ export default {
 
     },
     watch: {
-        article: { // computed 里的article
+        articleInfo: { // computed 里的article
             handler(val, oldVal){
+                let saveData ={
+                    bookId: val.bookId,
+                    chapterId: val.chapterId,
+                    fontSize: val.fontSize,
+                    bgColor: val.bgColor,
+                    isDaytime: val.isDaytime,
+                };
+
                 this.$store.dispatch('setReaderInfoAll', val);
-                this.global.setLocalStorage('qidian_reader' ,val);
-                // console.log(val)
+                this.global.setLocalStorage('qidian_reader' ,saveData);
+                // console.log(this.$store.state.article)
                 // 选择 章节后 隐藏 选项栏
                 if (!val.chapterListState&&this.showBar) {
                     this.showBar = !this.showBar;
@@ -161,7 +179,8 @@ export default {
             deep: true //深度监听
         },
         curChapterId(val, oldVal){ //章节改变 获取数据
-            this.getChapterContent(val)
+            // console.log(val)
+            this.getChapterContent(val.id, this.$store.state.article.getChapterType)
         }
     }
 }
@@ -205,6 +224,13 @@ export default {
             top: 0;
             left: 0;
             z-index: 1;
+        }
+        .click-arear{
+            height: 30%; 
+            width: 100%;
+            position: fixed;
+            top: 35%;
+            left: 0;
         }
         .read-section{
             color: rgba(0,0,0,.85);

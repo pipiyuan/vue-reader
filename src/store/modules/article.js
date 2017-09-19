@@ -2,12 +2,13 @@ import * as types from '../mutation-types'
 
 // initial state
 const state = {
-    articleId: 1,
+    bookId: 1,
     chapterId: 1,
     fontSize: '18px',
     bgColor: '#e9dfc7',
-    isDaytime: true,
-    chapterListState: false
+    isDaytime: false,
+    chapterListState: false,
+    getChapterType: true,   // 获取章节内容，true为push，false为替换
 }
 
 // getters
