@@ -7,7 +7,7 @@ export default {
 			getLocalStorage(key) {
 				return JSON.parse(localStorage.getItem(key))
 			},
-			api: 'http://120.77.81.108:3000/qidian'
+			api: 'https://www.pipiyuan.top/qidian/reader/qidian'
 		}
 	}
 }
