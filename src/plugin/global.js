@@ -7,7 +7,7 @@ export default {
 			getLocalStorage(key) {
 				return JSON.parse(localStorage.getItem(key))
 			},
-			api: 'https://www.pipiyuan.top/qidian/reader/qidian'
+			api: 'https://www.pipiyuan.top/qidian/reader/api/qidian'
 		}
 	}
 }
