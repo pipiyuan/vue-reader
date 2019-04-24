@@ -18,7 +18,7 @@
                 <i class="el-icon-search"></i>三生三世</div>
         </div>
         <div class="home-nav">
-            <a class="book-type-item" href="" title="" v-for="(item,index) in bookType" key="index">
+            <a class="book-type-item" href="" title="" v-for="(item,index) in bookType" :key="index">
                 <i></i>
                 <h4>{{item.name}}</h4>
             </a>
